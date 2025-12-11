@@ -21,4 +21,13 @@ export class CertificadoForm {
   formValido() {
     return this.atividades.length > 0 && this.nome.trim().length > 0;
   }
+
+  adicionarAtividade() {
+    this.atividades.push(this.atividade.trim());
+    this.atividade = '';
+  }
+
+  excluirAtividade(index: number) {
+    this.atividades.splice(index, 1);
+  }
 }

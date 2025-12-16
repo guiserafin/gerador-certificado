@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SecundaryButton } from '../../_components/secundary-button/secundary-button';
 import { PrimaryButton } from '../../_components/primary-button/primary-button';
-import { FormsModule, NgModel } from '@angular/forms';
+import { FormsModule, NgForm, NgModel } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Certificado } from '../../interfaces/certificado';
 import { CertificadoService } from '../../_services/certificado.service';
+import { v4 as uuidv4 } from 'uuid';
 @Component({
   selector: 'app-certificado-form',
   imports: [SecundaryButton, PrimaryButton, FormsModule, CommonModule],
@@ -14,10 +15,12 @@ import { CertificadoService } from '../../_services/certificado.service';
 export class CertificadoForm {
 
   constructor(private certificadoService: CertificadoService) { }
+  @ViewChild('form') form!: NgForm;
 
   atividade: string = '';
 
   certificado: Certificado = {
+    id: '',
     nome: '',
     atividades: [],
     dataEmissao: ''
@@ -32,6 +35,11 @@ export class CertificadoForm {
   }
 
   adicionarAtividade() {
+
+    if (this.atividade.trim().length === 0) {
+      return;
+    }
+
     this.certificado.atividades.push(this.atividade.trim());
     this.atividade = '';
   }
@@ -46,10 +54,13 @@ export class CertificadoForm {
       return;
     }
 
+    this.certificado.id = uuidv4();
     this.certificado.dataEmissao = this.dataAtual();
 
     this.certificadoService.adicionarCertificado(this.certificado);
 
+    this.certificado = this.estadoInicialCertificado();
+    this.form.resetForm();
   }
 
   dataAtual(): string {
@@ -58,5 +69,14 @@ export class CertificadoForm {
     const mes = String(dataAtual.getMonth() + 1).padStart(2, '0');
     const ano = dataAtual.getFullYear();
     return `${dia}/${mes}/${ano}`;
+  }
+
+  estadoInicialCertificado() : Certificado {
+    return {
+      id: '',
+      nome: '',
+      atividades: [],
+      dataEmissao: ''
+    };
   }
 }
